@@ -1,0 +1,678 @@
+import { useState } from "react";
+import "./App.css";
+
+const sections = [
+  {
+    id: "docker",
+    name: "Docker",
+    cards: [
+      {
+        question: "CMD vs ENTRYPOINT — в чём разница и как работает?",
+        answer: (
+          <>
+            <ul>
+              <li>
+                <b>ENTRYPOINT</b> — главная команда, почти всегда выполняется.
+              </li>
+              <li>
+                <b>CMD</b> — команда или аргументы по умолчанию, которые можно
+                полностью заменить.
+              </li>
+            </ul>
+
+            <p>Пример:</p>
+
+            <pre>
+              <code>{`ENTRYPOINT ["nginx"]
+CMD ["-g", "daemon off;"]`}</code>
+            </pre>
+
+            <ul>
+              <li>
+                <code>docker run image</code> → nginx -g "daemon off;"
+              </li>
+              <li>
+                <code>docker run image -g "daemon on;"</code> → nginx -g
+                "daemon on;"
+              </li>
+            </ul>
+
+            <p>
+              Если используется только <b>CMD</b>, то{" "}
+              <code>docker run image bash</code> полностью заменит команду.
+            </p>
+          </>
+        ),
+      },
+
+      {
+        question: "Volume vs Bind Mount — как работают?",
+        answer: (
+          <>
+            <p>
+              <b>Volume</b> — Docker сам создаёт и управляет хранилищем.
+            </p>
+
+            <pre>
+              <code>{`docker volume create data
+docker run -v data:/app/db postgres`}</code>
+            </pre>
+
+            <p>
+              Данные обычно живут в <code>/var/lib/docker/volumes/</code>.
+            </p>
+
+            <hr />
+
+            <p>
+              <b>Bind Mount</b> — монтируешь папку с хоста напрямую в
+              контейнер.
+            </p>
+
+            <pre>
+              <code>docker run -v /home/user/code:/app nginx</code>
+            </pre>
+
+            <p>Изменения на хосте сразу видны внутри контейнера.</p>
+          </>
+        ),
+      },
+
+      {
+        question: "Как устроена сеть в Docker? Базовые драйверы",
+        answer: (
+          <>
+            <p>
+              Docker создаёт виртуальные сети. Контейнеры получают IP внутри
+              них.
+            </p>
+
+            <ul>
+              <li>
+                <b>bridge</b> — используется по умолчанию. Изолированная сеть +
+                NAT.
+              </li>
+              <li>
+                <b>host</b> — контейнер использует сеть хоста напрямую.
+              </li>
+              <li>
+                <b>none</b> — у контейнера вообще нет сети.
+              </li>
+            </ul>
+          </>
+        ),
+      },
+
+      {
+        question: "ARG vs ENV — в чём разница?",
+        answer: (
+          <>
+            <p>
+              <b>ARG</b> — переменная только во время сборки Docker image.
+            </p>
+
+            <pre>
+              <code>{`ARG VERSION=1.0
+RUN echo $VERSION`}</code>
+            </pre>
+
+            <p>
+              Передаётся через{" "}
+              <code>docker build --build-arg VERSION=2.0 .</code>
+            </p>
+
+            <hr />
+
+            <p>
+              <b>ENV</b> — переменная сохраняется в контейнере и доступна
+              приложению.
+            </p>
+
+            <pre>
+              <code>ENV NODE_ENV=production</code>
+            </pre>
+          </>
+        ),
+      },
+
+      {
+        question: "Что такое Multistage и зачем AS builder?",
+        answer: (
+          <>
+            <p>
+              <b>Multistage build</b> — несколько этапов <code>FROM</code> в
+              одном Dockerfile.
+            </p>
+
+            <ul>
+              <li>Итоговый образ меньше.</li>
+              <li>В runtime нет компиляторов и лишнего кэша.</li>
+              <li>Безопаснее.</li>
+            </ul>
+
+            <p>
+              <b>AS builder</b> — имя этапа, на который потом можно ссылаться.
+            </p>
+
+            <pre>
+              <code>{`FROM golang:1.22 AS builder
+WORKDIR /app
+COPY . .
+RUN go build -o app
+
+FROM alpine
+COPY --from=builder /app/app .
+CMD ["./app"]`}</code>
+            </pre>
+          </>
+        ),
+      },
+
+      {
+        question: "ADD vs COPY — в чём разница?",
+        answer: (
+          <>
+            <p>Оба копируют файлы в Docker image, но:</p>
+
+            <ul>
+              <li>
+                <b>COPY</b> — просто копирует файлы и папки с хоста в образ.
+                Рекомендуется почти всегда.
+              </li>
+              <li>
+                <b>ADD</b> — умеет автоматически распаковывать архивы и
+                скачивать файлы по URL.
+              </li>
+            </ul>
+
+            <pre>
+              <code>{`COPY app.py /app/                # просто копирует
+ADD archive.tar.gz /app/          # распакует архив
+ADD https://example.com/file.txt /app/`}</code>
+            </pre>
+
+            <p>
+              <b>Правило:</b> если не нужна распаковка или скачивание —
+              используй <code>COPY</code>.
+            </p>
+          </>
+        ),
+      },
+    ],
+  },
+
+  {
+    id: "kubernetes",
+    name: "Kubernetes",
+    cards: [
+      {
+        question: "Основные компоненты Kubernetes?",
+        answer: (
+          <>
+            <p>
+              <b>Control Plane:</b>
+            </p>
+
+            <ul>
+              <li>
+                <b>kube-apiserver</b> — входная точка API.
+              </li>
+              <li>
+                <b>etcd</b> — хранилище состояния кластера.
+              </li>
+              <li>
+                <b>scheduler</b> — решает, на какой ноде запустить Pod.
+              </li>
+              <li>
+                <b>controller-manager</b> — следит, чтобы желаемое состояние
+                совпадало с реальным.
+              </li>
+            </ul>
+
+            <p>
+              <b>Worker Node:</b>
+            </p>
+
+            <ul>
+              <li>
+                <b>kubelet</b> — агент на ноде, управляющий Pod.
+              </li>
+              <li>
+                <b>kube-proxy</b> — сетевые правила.
+              </li>
+              <li>
+                <b>container runtime</b> — containerd или CRI-O, запускает
+                контейнеры.
+              </li>
+            </ul>
+          </>
+        ),
+      },
+
+      {
+        question: "Stateful vs Stateless — в чём разница?",
+        answer: (
+          <>
+            <p>
+              <b>Stateless</b> — приложение не хранит состояние локально.
+            </p>
+
+            <ul>
+              <li>Любой Pod может обработать любой запрос.</li>
+              <li>Легко масштабировать.</li>
+              <li>Обычно используется Deployment.</li>
+              <li>Примеры: веб-сервер, API.</li>
+            </ul>
+
+            <hr />
+
+            <p>
+              <b>Stateful</b> — у каждого экземпляра есть своё постоянное
+              состояние.
+            </p>
+
+            <ul>
+              <li>Данные.</li>
+              <li>Постоянный идентификатор.</li>
+              <li>Обычно используется StatefulSet + PVC.</li>
+              <li>Примеры: базы данных, Kafka.</li>
+            </ul>
+          </>
+        ),
+      },
+
+      {
+        question: "Какую функцию выполняет ReplicaSet?",
+        answer: (
+          <>
+            <p>
+              <b>ReplicaSet</b> следит, чтобы всегда работало нужное количество
+              одинаковых Pod.
+            </p>
+
+            <ul>
+              <li>Pod умер → создаёт новый.</li>
+              <li>Pod слишком много → удаляет лишний.</li>
+            </ul>
+
+            <p>
+              Обычно напрямую ReplicaSet не используют — им управляет{" "}
+              <b>Deployment</b>.
+            </p>
+          </>
+        ),
+      },
+
+      {
+        question: "Что такое Deployment?",
+        answer: (
+          <>
+            <p>
+              <b>Deployment</b> — контроллер, который управляет ReplicaSet.
+            </p>
+
+            <p>Позволяет:</p>
+
+            <ul>
+              <li>держать нужное количество реплик;</li>
+              <li>делать rolling update без даунтайма;</li>
+              <li>
+                откатываться через <code>kubectl rollout undo</code>.
+              </li>
+            </ul>
+
+            <p>Это самый частый способ запускать приложения в Kubernetes.</p>
+          </>
+        ),
+      },
+
+      {
+        question: "Какая роль у DaemonSet?",
+        answer: (
+          <>
+            <p>
+              <b>DaemonSet</b> гарантирует, что на каждой ноде или выбранных
+              нодах работает Pod.
+            </p>
+
+            <p>Добавляется новая нода → Pod появляется автоматически.</p>
+
+            <p>Используется для:</p>
+
+            <ul>
+              <li>логирования;</li>
+              <li>мониторинга — node-exporter;</li>
+              <li>сетевых плагинов.</li>
+            </ul>
+          </>
+        ),
+      },
+
+      {
+        question: "PV vs PVC — в чём разница и как устроено?",
+        answer: (
+          <>
+            <ul>
+              <li>
+                <b>PV — PersistentVolume</b> — реальное хранилище, например
+                диск.
+              </li>
+              <li>
+                <b>PVC — PersistentVolumeClaim</b> — заявка на хранилище.
+                Например: «дай мне 10 ГБ».
+              </li>
+            </ul>
+
+            <p>
+              Kubernetes находит подходящий PV и привязывает его к PVC.
+            </p>
+
+            <p>
+              Pod монтирует PVC как обычную папку, поэтому приложению не нужно
+              знать, где физически лежат данные.
+            </p>
+          </>
+        ),
+      },
+
+      {
+        question: "Что такое Kubernetes Probes?",
+        answer: (
+          <>
+            <p>
+              Это проверки здоровья Pod, которые выполняет <b>kubelet</b>.
+            </p>
+
+            <ul>
+              <li>
+                <b>Startup Probe</b> — проверяет, что приложение запустилось.
+              </li>
+              <li>
+                <b>Readiness Probe</b> — готов ли Pod принимать трафик.
+              </li>
+              <li>
+                <b>Liveness Probe</b> — жив ли процесс. Если проверка не
+                проходит, контейнер перезапускают.
+              </li>
+            </ul>
+          </>
+        ),
+      },
+
+      {
+        question: "Что такое Service и какие типы есть?",
+        answer: (
+          <>
+            <p>
+              <b>Service</b> — стабильная точка доступа к Pod, потому что IP
+              Pod могут меняться.
+            </p>
+
+            <ul>
+              <li>
+                <b>ClusterIP</b> — доступен внутри кластера.
+              </li>
+              <li>
+                <b>NodePort</b> — открывает порт на каждой ноде.
+              </li>
+              <li>
+                <b>LoadBalancer</b> — внешний балансировщик.
+              </li>
+              <li>
+                <b>ExternalName</b> — DNS-алиас на внешний сервис.
+              </li>
+            </ul>
+          </>
+        ),
+      },
+    ],
+  },
+
+  {
+    id: "helm",
+    name: "Helm",
+    cards: [
+      {
+        question: "Разница между Chart.yaml и values.yaml?",
+        answer: (
+          <>
+            <ul>
+              <li>
+                <b>Chart.yaml</b> — метаданные Chart: имя, версия, описание,
+                зависимости.
+              </li>
+              <li>
+                <b>values.yaml</b> — значения по умолчанию: image, replicas,
+                ports и другое.
+              </li>
+            </ul>
+
+            <p>
+              Значения из <code>values.yaml</code> можно переопределять при
+              установке Chart.
+            </p>
+          </>
+        ),
+      },
+
+      {
+        question: "Что такое Helm Release?",
+        answer: (
+          <>
+            <p>
+              <b>Helm Release</b> — конкретный установленный экземпляр Chart в
+              Kubernetes.
+            </p>
+
+            <ul>
+              <li>имя;</li>
+              <li>версия;</li>
+              <li>история изменений.</li>
+            </ul>
+
+            <pre>
+              <code>helm install my-app ./chart</code>
+            </pre>
+
+            <p>Создаёт Release с именем <code>my-app</code>.</p>
+          </>
+        ),
+      },
+
+      {
+        question: "Разница между helm install и helm upgrade?",
+        answer: (
+          <>
+            <ul>
+              <li>
+                <b>helm install</b> — устанавливает Chart впервые.
+              </li>
+              <li>
+                <b>helm upgrade</b> — обновляет существующий Release.
+              </li>
+            </ul>
+
+            <p>
+              <code>helm upgrade --install</code> обновит Release, а если его
+              нет — установит.
+            </p>
+          </>
+        ),
+      },
+    ],
+  },
+
+  {
+    id: "prometheus",
+    name: "Prometheus",
+    cards: [
+      {
+        question: "Pull vs Push модель сбора метрик?",
+        answer: (
+          <>
+            <ul>
+              <li>
+                <b>Pull</b> — Prometheus сам приходит к приложению и забирает
+                метрики с <code>/metrics</code>.
+              </li>
+              <li>
+                <b>Push</b> — приложение само отправляет метрики в систему.
+              </li>
+            </ul>
+
+            <p>
+              Pull проще контролировать и масштабировать в Kubernetes.
+            </p>
+          </>
+        ),
+      },
+
+      {
+        question: "Разница между rate(), irate() и increase()?",
+        answer: (
+          <>
+            <p>Все три функции обычно работают с Counter.</p>
+
+            <ul>
+              <li>
+                <code>rate()</code> — средняя скорость увеличения в секунду за
+                период.
+              </li>
+              <li>
+                <code>irate()</code> — скорость по последним двум точкам,
+                поэтому более шумная.
+              </li>
+              <li>
+                <code>increase()</code> — абсолютное увеличение Counter за
+                период.
+              </li>
+            </ul>
+          </>
+        ),
+      },
+
+      {
+        question: "Основные типы метрик в Prometheus?",
+        answer: (
+          <>
+            <ul>
+              <li>
+                <b>Counter</b> — только растёт. Например: количество запросов и
+                ошибок.
+              </li>
+              <li>
+                <b>Gauge</b> — может расти и падать. Например: память или
+                количество Pod.
+              </li>
+              <li>
+                <b>Histogram</b> — распределение значений по bucket.
+              </li>
+              <li>
+                <b>Summary</b> — квантили считаются на стороне приложения.
+              </li>
+            </ul>
+          </>
+        ),
+      },
+    ],
+  },
+];
+
+function App() {
+  const [activeSectionId, setActiveSectionId] = useState("docker");
+  const [flashIndex, setFlashIndex] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  const activeSection = sections.find(
+    (section) => section.id === activeSectionId
+  );
+
+  const cards = activeSection.cards;
+  const currentCard = cards[flashIndex];
+
+  const selectSection = (sectionId) => {
+    setIsFlipped(false);
+    setActiveSectionId(sectionId);
+    setFlashIndex(0);
+  };
+
+  const nextCard = () => {
+    setIsFlipped(false);
+
+    setTimeout(() => {
+      setFlashIndex((prev) =>
+        prev === cards.length - 1 ? 0 : prev + 1
+      );
+    }, 250);
+  };
+
+  const previousCard = () => {
+    setIsFlipped(false);
+
+    setTimeout(() => {
+      setFlashIndex((prev) =>
+        prev === 0 ? cards.length - 1 : prev - 1
+      );
+    }, 250);
+  };
+
+  return (
+    <div className="app">
+      <main className="content">
+        <section className="flash-section">
+          <div className="section-navigation">
+            {sections.map((section) => (
+              <button
+                key={section.id}
+                className={
+                  activeSectionId === section.id
+                    ? "section-button active"
+                    : "section-button"
+                }
+                onClick={() => selectSection(section.id)}
+              >
+                {section.name}
+              </button>
+            ))}
+          </div>
+
+          <div className="counter">
+            {activeSection.name} · Вопрос {flashIndex + 1} из {cards.length}
+          </div>
+
+          <div
+            className={`flash-card ${isFlipped ? "flipped" : ""}`}
+            onClick={() => setIsFlipped((prev) => !prev)}
+          >
+            <div className="flash-card-inner">
+              <div className="flash-card-front">
+                <span className="card-title">ВОПРОС</span>
+
+                <h1>{currentCard.question}</h1>
+
+                <p className="click-text">
+                  Нажми на карточку, чтобы увидеть ответ
+                </p>
+              </div>
+
+              <div className="flash-card-back">
+                <span className="card-title">ОТВЕТ</span>
+
+                <div className="answer-content">
+                  {currentCard.answer}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flash-controls">
+            <button onClick={previousCard}>← Назад</button>
+            <button onClick={nextCard}>Следующая →</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+export default App;
