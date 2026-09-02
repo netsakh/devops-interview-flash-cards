@@ -438,11 +438,255 @@ ADD https://example.com/file.txt /app/`}</code>
       },
       {
         question: "Что делает Readiness Probe?",
-        options: [
-          "Перезапускает контейнер",
-          "Проверяет, готов ли Pod принимать трафик",
-          "Создаёт новый Pod",
-        ],
+        options: ["Перезапускает контейнер", "Проверяет, готов ли Pod принимать трафик", "Создаёт новый Pod"],
+        correctAnswer: 1,
+      },
+      {
+        question: "Какой Service доступен только внутри Kubernetes-кластера?",
+        options: ["NodePort", "LoadBalancer", "ClusterIP"],
+        correctAnswer: 2,
+      },
+      {
+        question: "Для чего используется DaemonSet?",
+        options: ["Запустить Pod на каждой выбранной ноде", "Создать постоянный диск", "Хранить секреты"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает ReplicaSet?",
+        options: ["Хранит конфигурацию приложения", "Поддерживает нужное количество Pod", "Открывает внешний IP"],
+        correctAnswer: 1,
+      },
+      {
+        question: "Что такое PVC?",
+        options: ["Заявка на persistent storage", "Сетевой балансировщик", "Контроллер Pod"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Какая Probe отвечает за перезапуск контейнера при постоянном падении проверки?",
+        options: ["Liveness Probe", "Readiness Probe", "Startup Probe"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое Pod?",
+        options: ["Минимальная deployable-единица Kubernetes", "Виртуальная машина", "Только сетевой объект"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает kubelet?",
+        options: ["Управляет Pod на своей ноде", "Хранит состояние кластера", "Балансирует внешний трафик"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Какую роль выполняет kube-apiserver?",
+        options: ["Предоставляет API Kubernetes", "Запускает контейнеры напрямую", "Хранит Docker images"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Для чего нужен kube-scheduler?",
+        options: ["Выбирает ноду для нового Pod", "Создаёт Service", "Собирает логи"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает controller-manager?",
+        options: ["Следит за желаемым состоянием ресурсов", "Хранит образы", "Выдаёт IP Pod"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое StatefulSet?",
+        options: ["Контроллер для stateful-приложений", "Сетевой балансировщик", "Система логирования"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое Namespace?",
+        options: ["Логическое разделение ресурсов кластера", "Отдельная физическая нода", "Тип container runtime"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое ConfigMap?",
+        options: ["Хранилище обычной конфигурации", "Хранилище паролей с шифрованием", "Балансировщик нагрузки"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое Secret?",
+        options: ["Ресурс для хранения чувствительных данных", "Реплика Pod", "PersistentVolume"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает Service?",
+        options: ["Даёт стабильную точку доступа к Pod", "Создаёт Docker image", "Запускает scheduler"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает NodePort?",
+        options: ["Открывает Service через порт ноды", "Создаёт новую ноду", "Хранит состояние"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает LoadBalancer Service?",
+        options: ["Предоставляет внешний load balancer, если его поддерживает окружение", "Удаляет Pod", "Монтирует PVC"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое Ingress?",
+        options: ["Правила HTTP/HTTPS-маршрутизации к сервисам", "Хранилище метрик", "Container runtime"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое Ingress Controller?",
+        options: ["Компонент, реализующий обработку Ingress", "Kubernetes database", "ReplicaSet"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает kubectl apply?",
+        options: ["Применяет декларативную конфигурацию ресурса", "Удаляет namespace", "Собирает image"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что показывает kubectl get pods?",
+        options: ["Список Pod и их состояние", "Логи контейнера", "Историю Git"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Для чего нужен kubectl describe?",
+        options: ["Показывает подробную информацию о ресурсе и события", "Удаляет ресурс", "Создаёт image"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Как посмотреть логи Pod?",
+        options: ["kubectl logs", "kubectl events", "kubectl trace"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое labels?",
+        options: ["Ключ-значение для идентификации и группировки объектов", "Пароли Kubernetes", "IP-адреса нод"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое selector?",
+        options: ["Условие выбора объектов по labels", "DNS-сервер", "Тип volume"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Как Service находит Pod?",
+        options: ["Через selector и labels", "Через Dockerfile", "Через Git commit"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое requests CPU/memory?",
+        options: ["Минимально запрашиваемые ресурсы для планирования", "Жёсткий максимальный лимит", "Размер Docker image"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое limits CPU/memory?",
+        options: ["Ограничение потребления ресурсов контейнером", "Количество реплик", "Размер PVC"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что происходит при превышении memory limit?",
+        options: ["Контейнер может быть завершён из-за OOMKilled", "Создаётся новый Service", "Pod автоматически становится StatefulSet"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое HPA?",
+        options: ["Horizontal Pod Autoscaler", "Host Port Allocator", "Helm Pod Agent"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что масштабирует HPA?",
+        options: ["Количество реплик workload", "Размер ноды", "Размер Docker image"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое PDB?",
+        options: ["PodDisruptionBudget", "Pod Docker Backup", "Persistent Disk Block"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Для чего нужен PDB?",
+        options: ["Ограничивать количество добровольно недоступных Pod при disruption", "Хранить секреты", "Маршрутизировать HTTP"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое taint у ноды?",
+        options: ["Ограничение, препятствующее размещению Pod без соответствующей toleration", "Метка Service", "Тип PVC"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое toleration?",
+        options: ["Разрешение Pod размещаться на ноде с соответствующим taint", "Ограничение CPU", "Тип Ingress"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое nodeSelector?",
+        options: ["Простой способ выбрать ноды по labels", "Выбор Pod по IP", "Выбор Service по порту"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое affinity/anti-affinity?",
+        options: ["Правила предпочтения или ограничения размещения Pod", "Настройка DNS", "Настройка storage"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое rolling update?",
+        options: ["Постепенная замена старой версии Pod новой", "Одновременное удаление всех Pod", "Обновление только etcd"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Как откатить Deployment?",
+        options: ["kubectl rollout undo deployment/<name>", "kubectl rollback pod/<name>", "kubectl git revert deployment/<name>"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что показывает kubectl rollout status?",
+        options: ["Статус rollout workload", "Статус Docker daemon", "Состояние Git branch"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое CrashLoopBackOff?",
+        options: ["Контейнер падает и Kubernetes увеличивает интервалы между перезапусками", "Нода выключена навсегда", "Service удалён"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что означает Pending у Pod?",
+        options: ["Pod ещё не запущен на ноде, например из-за проблем с scheduling", "Контейнер успешно завершён", "Pod обязательно сломан"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что означает ImagePullBackOff?",
+        options: ["Kubernetes не может получить image и повторяет попытки с backoff", "PVC заполнен", "Ingress не найден"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое CNI?",
+        options: ["Интерфейс/плагины сетевого взаимодействия контейнеров", "Система хранения секретов", "Контроллер реплик"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое CSI?",
+        options: ["Интерфейс для storage plugins", "Интерфейс HTTP", "Система CI/CD"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Зачем нужен PersistentVolume?",
+        options: ["Предоставляет persistent storage ресурсам Kubernetes", "Балансирует трафик", "Запускает scheduler"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое StorageClass?",
+        options: ["Описывает класс/способ динамического предоставления storage", "Тип Service", "Тип Pod"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что происходит при удалении Pod, созданного Deployment?",
+        options: ["Deployment/ReplicaSet создаёт замену, если реплик стало меньше желаемого", "Кластер всегда останавливается", "PVC удаляется автоматически"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Какой объект задаёт желаемое состояние количества реплик приложения?",
+        options: ["Deployment", "Service", "ConfigMap"],
+        correctAnswer: 0,
+      },
+    ],
         correctAnswer: 1,
       },
       {
@@ -561,11 +805,205 @@ ADD https://example.com/file.txt /app/`}</code>
     quizQuestions: [
       {
         question: "За что отвечает Chart.yaml?",
-        options: [
-          "За значения конфигурации приложения",
-          "За метаданные Helm Chart",
-          "За состояние Pod",
-        ],
+        options: ["За значения конфигурации приложения", "За метаданные Helm Chart", "За состояние Pod"],
+        correctAnswer: 1,
+      },
+      {
+        question: "Где обычно хранятся значения по умолчанию для Helm Chart?",
+        options: ["values.yaml", "Chart.lock", "templates.yaml"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое Helm Release?",
+        options: ["Конкретный установленный экземпляр Chart", "Docker image", "Kubernetes Node"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает helm install?",
+        options: ["Удаляет Release", "Устанавливает Chart", "Только проверяет шаблоны"],
+        correctAnswer: 1,
+      },
+      {
+        question: "Что делает helm upgrade?",
+        options: ["Обновляет существующий Release", "Создаёт новую Kubernetes-ноду", "Удаляет values.yaml"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что произойдёт при использовании helm upgrade --install?",
+        options: ["Всегда будет удалён старый Release", "Release обновится, а если его нет — будет установлен", "Будет создан только values.yaml"],
+        correctAnswer: 1,
+      },
+      {
+        question: "Каким файлом обычно задают значения, которые передаются в шаблоны Helm?",
+        options: ["values.yaml", "Chart.yaml", "README.md"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Где находятся шаблоны Kubernetes-манифестов Helm?",
+        options: ["templates/", "values/", "charts.yaml"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Для чего используется _helpers.tpl?",
+        options: ["Для переиспользуемых named templates", "Для хранения Secret", "Для запуска Helm"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает helm template?",
+        options: ["Рендерит шаблоны локально в Kubernetes-манифесты", "Устанавливает Release в кластер", "Удаляет Chart"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает helm lint?",
+        options: ["Проверяет Chart на проблемы", "Удаляет Release", "Публикует image"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что показывает helm list?",
+        options: ["Установленные Releases", "Все Pod", "Все Docker images"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает helm uninstall?",
+        options: ["Удаляет Release", "Удаляет Helm binary", "Удаляет Kubernetes namespace всегда"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Для чего нужен helm repo add?",
+        options: ["Добавляет Helm repository", "Создаёт Release", "Создаёт namespace"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает helm repo update?",
+        options: ["Обновляет локальную информацию о доступных Chart в репозиториях", "Обновляет Kubernetes", "Обновляет values.yaml"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое Chart dependency?",
+        options: ["Другой Chart, необходимый текущему Chart", "Docker container", "Kubernetes Node"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Где можно описать зависимости Chart?",
+        options: ["В Chart.yaml", "В README.md", "В Dockerfile"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое Chart.lock?",
+        options: ["Зафиксированные версии зависимостей Chart", "Состояние Pod", "Helm Secret"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает helm dependency update?",
+        options: ["Обновляет зависимости Chart и lock-файл", "Обновляет Pod", "Удаляет зависимости"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Как передать значение при helm install?",
+        options: ["helm install app ./chart --set image.tag=1.2.3", "helm install app ./chart --env image.tag=1.2.3", "helm install app ./chart --value-only image.tag=1.2.3"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что имеет больший приоритет: --set или values.yaml?",
+        options: ["--set", "values.yaml", "Chart.yaml всегда"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Для чего нужен .Values в шаблоне?",
+        options: ["Для доступа к значениям Helm values", "Для доступа к etcd", "Для запуска kubectl"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Для чего нужен .Release.Name?",
+        options: ["Для получения имени текущего Release", "Для получения IP Pod", "Для получения версии Kubernetes"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает include в Helm?",
+        options: ["Рендерит named template и возвращает результат", "Устанавливает Chart", "Удаляет namespace"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает tpl?",
+        options: ["Позволяет отрендерить строку как Helm template", "Создаёт PVC", "Проверяет Git"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое Helm hook?",
+        options: ["Ресурс/действие, запускаемое в определённый момент жизненного цикла Release", "Тип Kubernetes Service", "Docker volume"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает helm history?",
+        options: ["Показывает историю ревизий Release", "Показывает историю Pod", "Показывает Git commits"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает helm rollback?",
+        options: ["Откатывает Release к предыдущей ревизии", "Откатывает Kubernetes version", "Удаляет Chart"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое revision у Helm Release?",
+        options: ["Номер ревизии Release", "Номер Pod", "Версия Docker"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает helm get values?",
+        options: ["Показывает значения, использованные Release", "Показывает Pod logs", "Показывает Git diff"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает helm get manifest?",
+        options: ["Показывает сгенерированные Kubernetes-манифесты Release", "Показывает Dockerfile", "Показывает values repository"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает helm show values?",
+        options: ["Показывает values.yaml из Chart", "Показывает текущие Pod", "Показывает Release history"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает helm package?",
+        options: ["Упаковывает Chart в архив", "Устанавливает Chart", "Удаляет Chart"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает helm pull?",
+        options: ["Скачивает Chart из repository", "Запускает Pod", "Рендерит Deployment"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает helm search repo?",
+        options: ["Ищет Chart в добавленных repositories", "Ищет Pod", "Ищет Secret"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Зачем нужен .Chart в шаблонах?",
+        options: ["Для доступа к информации текущего Chart", "Для доступа к Pod IP", "Для доступа к Git"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое NOTES.txt?",
+        options: ["Файл с информацией, показываемой после установки/обновления Release", "Конфигурация Kubernetes API", "Lock-файл"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Как проверить итоговые манифесты перед установкой?",
+        options: ["helm template", "helm uninstall", "helm repo update"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое subchart?",
+        options: ["Chart, используемый как зависимость другого Chart", "Отдельный Kubernetes master", "Тип Secret"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Какой флаг helm install позволяет установить Chart с указанным namespace, создав его при необходимости?",
+        options: ["--create-namespace", "--namespace-create", "--new-namespace"],
+        correctAnswer: 0,
+      },
+    ],
         correctAnswer: 1,
       },
       {
