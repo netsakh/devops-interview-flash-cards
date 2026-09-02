@@ -687,46 +687,6 @@ ADD https://example.com/file.txt /app/`}</code>
         correctAnswer: 0,
       },
     ],
-        correctAnswer: 1,
-      },
-      {
-        question: "Какой Service доступен только внутри Kubernetes-кластера?",
-        options: ["NodePort", "LoadBalancer", "ClusterIP"],
-        correctAnswer: 2,
-      },
-      {
-        question: "Для чего используется DaemonSet?",
-        options: [
-          "Запустить Pod на каждой выбранной ноде",
-          "Создать постоянный диск",
-          "Хранить секреты",
-        ],
-        correctAnswer: 0,
-      },
-      {
-        question: "Что делает ReplicaSet?",
-        options: [
-          "Хранит конфигурацию приложения",
-          "Поддерживает нужное количество Pod",
-          "Открывает внешний IP",
-        ],
-        correctAnswer: 1,
-      },
-      {
-        question: "Что такое PVC?",
-        options: [
-          "Заявка на persistent storage",
-          "Сетевой балансировщик",
-          "Контроллер Pod",
-        ],
-        correctAnswer: 0,
-      },
-      {
-        question: "Какая Probe отвечает за перезапуск контейнера при постоянном падении проверки?",
-        options: ["Liveness Probe", "Readiness Probe", "Startup Probe"],
-        correctAnswer: 0,
-      },
-    ],
   },
 
   {
@@ -1001,55 +961,6 @@ ADD https://example.com/file.txt /app/`}</code>
       {
         question: "Какой флаг helm install позволяет установить Chart с указанным namespace, создав его при необходимости?",
         options: ["--create-namespace", "--namespace-create", "--new-namespace"],
-        correctAnswer: 0,
-      },
-    ],
-        correctAnswer: 1,
-      },
-      {
-        question: "Где обычно хранятся значения по умолчанию для Helm Chart?",
-        options: ["values.yaml", "Chart.lock", "templates.yaml"],
-        correctAnswer: 0,
-      },
-      {
-        question: "Что такое Helm Release?",
-        options: [
-          "Конкретный установленный экземпляр Chart",
-          "Docker image",
-          "Kubernetes Node",
-        ],
-        correctAnswer: 0,
-      },
-      {
-        question: "Что делает helm install?",
-        options: [
-          "Удаляет Release",
-          "Устанавливает Chart",
-          "Только проверяет шаблоны",
-        ],
-        correctAnswer: 1,
-      },
-      {
-        question: "Что делает helm upgrade?",
-        options: [
-          "Обновляет существующий Release",
-          "Создаёт новую Kubernetes-ноду",
-          "Удаляет values.yaml",
-        ],
-        correctAnswer: 0,
-      },
-      {
-        question: "Что произойдёт при использовании helm upgrade --install?",
-        options: [
-          "Всегда будет удалён старый Release",
-          "Release обновится, а если его нет — будет установлен",
-          "Будет создан только values.yaml",
-        ],
-        correctAnswer: 1,
-      },
-      {
-        question: "Каким файлом обычно задают значения, которые передаются в шаблоны Helm?",
-        options: ["values.yaml", "Chart.yaml", "README.md"],
         correctAnswer: 0,
       },
     ],
