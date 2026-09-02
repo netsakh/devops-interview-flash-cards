@@ -1334,6 +1334,17 @@ git merge`}</code>
   },
 ];
 
+const shuffleArray = (array) => {
+  const shuffled = [...array];
+
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  return shuffled;
+};
+
 function App() {
   const [activeSectionId, setActiveSectionId] = useState("docker");
   const [flashIndex, setFlashIndex] = useState(0);
@@ -1343,6 +1354,7 @@ function App() {
   const [mode, setMode] = useState("flashcards");
   const [quizIndex, setQuizIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [quizQuestions, setQuizQuestions] = useState([]);
 
   const activeSection = sections.find(
     (section) => section.id === activeSectionId
@@ -1353,7 +1365,6 @@ function App() {
 
   const isQuizAvailable = Boolean(activeSection.quizQuestions);
 
-  const quizQuestions = activeSection.quizQuestions || [];
   const currentQuiz = quizQuestions[quizIndex];
 
   const selectSection = (sectionId) => {
@@ -1362,6 +1373,10 @@ function App() {
     setFlashIndex(0);
     setQuizIndex(0);
     setSelectedAnswer(null);
+
+    const section = sections.find((item) => item.id === sectionId);
+
+    setQuizQuestions(shuffleArray(section?.quizQuestions || []));
     setMode("flashcards");
   };
 
@@ -1369,6 +1384,13 @@ function App() {
     setIsFlipped(false);
     setSelectedAnswer(null);
     setQuizIndex(0);
+
+    if (newMode === "quiz") {
+      setQuizQuestions(
+        shuffleArray(activeSection.quizQuestions || [])
+      );
+    }
+
     setMode(newMode);
   };
 
@@ -1447,7 +1469,7 @@ function App() {
             </div>
           )}
 
-          {mode === "quiz" && isQuizAvailable ? (
+          {mode === "quiz" && isQuizAvailable && currentQuiz ? (
             <>
               <div className="counter">
                 {activeSection.name} · Тест · Вопрос {quizIndex + 1} из{" "}
