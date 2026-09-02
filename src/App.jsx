@@ -424,6 +424,65 @@ ADD https://example.com/file.txt /app/`}</code>
         ),
       },
     ],
+
+    quizQuestions: [
+      {
+        question: "Какой компонент Kubernetes хранит состояние кластера?",
+        options: ["kubelet", "etcd", "kube-proxy"],
+        correctAnswer: 1,
+      },
+      {
+        question: "Какой объект обычно используют для запуска stateless-приложения?",
+        options: ["Deployment", "StatefulSet", "PersistentVolume"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает Readiness Probe?",
+        options: [
+          "Перезапускает контейнер",
+          "Проверяет, готов ли Pod принимать трафик",
+          "Создаёт новый Pod",
+        ],
+        correctAnswer: 1,
+      },
+      {
+        question: "Какой Service доступен только внутри Kubernetes-кластера?",
+        options: ["NodePort", "LoadBalancer", "ClusterIP"],
+        correctAnswer: 2,
+      },
+      {
+        question: "Для чего используется DaemonSet?",
+        options: [
+          "Запустить Pod на каждой выбранной ноде",
+          "Создать постоянный диск",
+          "Хранить секреты",
+        ],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает ReplicaSet?",
+        options: [
+          "Хранит конфигурацию приложения",
+          "Поддерживает нужное количество Pod",
+          "Открывает внешний IP",
+        ],
+        correctAnswer: 1,
+      },
+      {
+        question: "Что такое PVC?",
+        options: [
+          "Заявка на persistent storage",
+          "Сетевой балансировщик",
+          "Контроллер Pod",
+        ],
+        correctAnswer: 0,
+      },
+      {
+        question: "Какая Probe отвечает за перезапуск контейнера при постоянном падении проверки?",
+        options: ["Liveness Probe", "Readiness Probe", "Startup Probe"],
+        correctAnswer: 0,
+      },
+    ],
   },
 
   {
@@ -496,6 +555,64 @@ ADD https://example.com/file.txt /app/`}</code>
             </p>
           </>
         ),
+      },
+    ],
+
+    quizQuestions: [
+      {
+        question: "За что отвечает Chart.yaml?",
+        options: [
+          "За значения конфигурации приложения",
+          "За метаданные Helm Chart",
+          "За состояние Pod",
+        ],
+        correctAnswer: 1,
+      },
+      {
+        question: "Где обычно хранятся значения по умолчанию для Helm Chart?",
+        options: ["values.yaml", "Chart.lock", "templates.yaml"],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что такое Helm Release?",
+        options: [
+          "Конкретный установленный экземпляр Chart",
+          "Docker image",
+          "Kubernetes Node",
+        ],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что делает helm install?",
+        options: [
+          "Удаляет Release",
+          "Устанавливает Chart",
+          "Только проверяет шаблоны",
+        ],
+        correctAnswer: 1,
+      },
+      {
+        question: "Что делает helm upgrade?",
+        options: [
+          "Обновляет существующий Release",
+          "Создаёт новую Kubernetes-ноду",
+          "Удаляет values.yaml",
+        ],
+        correctAnswer: 0,
+      },
+      {
+        question: "Что произойдёт при использовании helm upgrade --install?",
+        options: [
+          "Всегда будет удалён старый Release",
+          "Release обновится, а если его нет — будет установлен",
+          "Будет создан только values.yaml",
+        ],
+        correctAnswer: 1,
+      },
+      {
+        question: "Каким файлом обычно задают значения, которые передаются в шаблоны Helm?",
+        options: ["values.yaml", "Chart.yaml", "README.md"],
+        correctAnswer: 0,
       },
     ],
   },
@@ -873,6 +990,11 @@ function App() {
   const [flashIndex, setFlashIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
 
+  // Для Kubernetes и Helm можно переключаться между карточками и тестом.
+  const [mode, setMode] = useState("flashcards");
+  const [quizIndex, setQuizIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+
   const activeSection = sections.find(
     (section) => section.id === activeSectionId
   );
@@ -880,10 +1002,25 @@ function App() {
   const cards = activeSection.cards;
   const currentCard = cards[flashIndex];
 
+  const isQuizAvailable = Boolean(activeSection.quizQuestions);
+
+  const quizQuestions = activeSection.quizQuestions || [];
+  const currentQuiz = quizQuestions[quizIndex];
+
   const selectSection = (sectionId) => {
     setIsFlipped(false);
     setActiveSectionId(sectionId);
     setFlashIndex(0);
+    setQuizIndex(0);
+    setSelectedAnswer(null);
+    setMode("flashcards");
+  };
+
+  const switchMode = (newMode) => {
+    setIsFlipped(false);
+    setSelectedAnswer(null);
+    setQuizIndex(0);
+    setMode(newMode);
   };
 
   const nextCard = () => {
@@ -906,6 +1043,19 @@ function App() {
     }, 250);
   };
 
+  const answerQuiz = (answerIndex) => {
+    // После первого ответа больше нельзя изменить выбор.
+    if (selectedAnswer !== null) return;
+    setSelectedAnswer(answerIndex);
+  };
+
+  const nextQuizQuestion = () => {
+    setSelectedAnswer(null);
+    setQuizIndex((prev) =>
+      prev === quizQuestions.length - 1 ? 0 : prev + 1
+    );
+  };
+
   return (
     <div className="app">
       <main className="content">
@@ -926,43 +1076,140 @@ function App() {
             ))}
           </div>
 
-          <div className="counter">
-            {activeSection.name} · Вопрос {flashIndex + 1} из {cards.length}
-          </div>
+          {isQuizAvailable && (
+            <div className="mode-navigation">
+              <button
+                className={`mode-button ${
+                  mode === "flashcards" ? "active" : ""
+                }`}
+                onClick={() => switchMode("flashcards")}
+              >
+                📚 Карточки
+              </button>
 
-          <div
-            className={`flash-card ${isFlipped ? "flipped" : ""}`}
-            onClick={() => setIsFlipped((prev) => !prev)}
-          >
-            <div className="flash-card-inner">
-              <div className="flash-card-front">
+              <button
+                className={`mode-button ${
+                  mode === "quiz" ? "active" : ""
+                }`}
+                onClick={() => switchMode("quiz")}
+              >
+                🧪 Тест
+              </button>
+            </div>
+          )}
+
+          {mode === "quiz" && isQuizAvailable ? (
+            <>
+              <div className="counter">
+                {activeSection.name} · Тест · Вопрос {quizIndex + 1} из{" "}
+                {quizQuestions.length}
+              </div>
+
+              <div className="quiz-card">
                 <span className="card-title">ВОПРОС</span>
 
-                <h1>{currentCard.question}</h1>
+                <h1>{currentQuiz.question}</h1>
 
-                <p className="click-text">
-                  Нажми на карточку, чтобы увидеть ответ
-                </p>
+                <div className="quiz-options">
+                  {currentQuiz.options.map((option, index) => {
+                    const isSelected = selectedAnswer === index;
+                    const isCorrect = index === currentQuiz.correctAnswer;
+
+                    let className = "quiz-option";
+
+                    if (selectedAnswer !== null) {
+                      if (isCorrect) {
+                        className += " correct";
+                      } else if (isSelected) {
+                        className += " wrong";
+                      }
+                    }
+
+                    return (
+                      <button
+                        key={option}
+                        className={className}
+                        onClick={() => answerQuiz(index)}
+                        disabled={selectedAnswer !== null}
+                      >
+                        <span className="option-number">
+                          {index + 1}
+                        </span>
+                        <span>{option}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {selectedAnswer !== null && (
+                  <div
+                    className={
+                      selectedAnswer === currentQuiz.correctAnswer
+                        ? "quiz-result correct-result"
+                        : "quiz-result wrong-result"
+                    }
+                  >
+                    {selectedAnswer === currentQuiz.correctAnswer
+                      ? "✓ Правильно"
+                      : `✕ Неправильно. Правильный ответ: ${
+                          currentQuiz.options[currentQuiz.correctAnswer]
+                        }`}
+                  </div>
+                )}
               </div>
 
-              <div className="flash-card-back">
-                <span className="card-title">ОТВЕТ</span>
+              <div className="flash-controls">
+                <button
+                  onClick={nextQuizQuestion}
+                  disabled={selectedAnswer === null}
+                >
+                  Следующий вопрос →
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="counter">
+                {activeSection.name} · Вопрос {flashIndex + 1} из{" "}
+                {cards.length}
+              </div>
 
-                <div className="answer-content">
-                  {currentCard.answer}
+              <div
+                className={`flash-card ${
+                  isFlipped ? "flipped" : ""
+                }`}
+                onClick={() => setIsFlipped((prev) => !prev)}
+              >
+                <div className="flash-card-inner">
+                  <div className="flash-card-front">
+                    <span className="card-title">ВОПРОС</span>
+
+                    <h1>{currentCard.question}</h1>
+
+                    <p className="click-text">
+                      Нажми на карточку, чтобы увидеть ответ
+                    </p>
+                  </div>
+
+                  <div className="flash-card-back">
+                    <span className="card-title">ОТВЕТ</span>
+
+                    <div className="answer-content">
+                      {currentCard.answer}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div className="flash-controls">
-            <button onClick={previousCard}>← Назад</button>
-            <button onClick={nextCard}>Следующая →</button>
-          </div>
+              <div className="flash-controls">
+                <button onClick={previousCard}>← Назад</button>
+                <button onClick={nextCard}>Следующая →</button>
+              </div>
+            </>
+          )}
         </section>
       </main>
     </div>
   );
 }
-
 export default App;
