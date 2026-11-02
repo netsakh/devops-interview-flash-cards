@@ -809,19 +809,18 @@ export default function App() {
   return <div className="app">
     <main className="content">
       <section className="flash-section">
-        <div className="study-layout" style={{ display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>
-          <aside className="navigator" style={{ flex: "0 0 250px", minWidth: 220, textAlign: "left" }}>
-            <h2 style={{ marginTop: 0 }}>Навигатор</h2>
-            <button className="section-button" onClick={startRandomSession} style={{ marginBottom: 16 }}>
+        <div className="study-layout">
+          <aside className="navigator">
+            <h2>Навигатор</h2>
+            <button className="section-button navigator-random-button" onClick={startRandomSession}>
               Случайные 5
             </button>
             {sections.map(section => (
-              <details className="navigator-section" key={section.id} open={section.id === activeSectionId && !randomMode}
-                style={{ marginBottom: 12, textAlign: "left" }}>
-                <summary style={{ cursor: "pointer", fontWeight: 700, padding: "8px 4px" }}>
-                  {section.name} <span style={{ opacity: 0.65, fontWeight: 400 }}>({section.cards.length})</span>
+              <details className="navigator-section" key={section.id} open={section.id === activeSectionId && !randomMode}>
+                <summary>
+                  {section.name} <span className="navigator-count">({section.cards.length})</span>
                 </summary>
-                <div className="navigator-questions" style={{ display: "flex", flexDirection: "column", gap: 5, padding: "6px 0 6px 12px" }}>
+                <div className="navigator-questions">
                   {section.cards.map((card, index) => {
                     const selected = !randomMode && section.id === activeSectionId && index === flashIndex;
                     return <button
@@ -830,19 +829,6 @@ export default function App() {
                       className={`navigator-question ${selected ? "active" : ""}`}
                       onClick={() => selectQuestion(section.id, index)}
                       aria-current={selected ? "page" : undefined}
-                      style={{
-                        textAlign: "left",
-                        whiteSpace: "normal",
-                        width: "100%",
-                        padding: "7px 9px",
-                        border: 0,
-                        borderRadius: 8,
-                        cursor: "pointer",
-                        background: selected ? "rgba(255,255,255,0.22)" : "transparent",
-                        color: "inherit",
-                        font: "inherit",
-                        lineHeight: 1.35
-                      }}
                     >
                       {index + 1}. {questionLabel(card.question)}
                     </button>;
@@ -852,7 +838,7 @@ export default function App() {
             ))}
           </aside>
 
-          <div className="flash-main" style={{ flex: "1 1 520px", minWidth: 0 }}>
+          <div className="flash-main">
             {randomFinished ? <>
               <div className="counter">Случайная подборка · 5 из 5</div>
               <div className="flash-card">
