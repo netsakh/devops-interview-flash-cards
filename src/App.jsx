@@ -754,47 +754,38 @@ export default function App() {
   const [activeSectionId, setActiveSectionId] = useState("linux");
   const [flashIndex, setFlashIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [randomOrder, setRandomOrder] = useState(false);
   const [randomMode, setRandomMode] = useState(false);
   const [randomDeck, setRandomDeck] = useState([]);
   const [randomFinished, setRandomFinished] = useState(false);
 
   const activeSection = sections.find(section => section.id === activeSectionId) || sections[0];
-  const sectionCards = useMemo(
-    () => randomOrder ? shuffleArray(activeSection.cards) : activeSection.cards,
-    [activeSection, randomOrder]
-  );
 
   const startRandomSession = () => {
     const allCards = sections.flatMap(section =>
-      section.cards.map(card => ({ ...card, category: section.name }))
+      section.cards.map((card, index) => ({
+        ...card,
+        category: section.name,
+        sourceSectionId: section.id,
+        sourceIndex: index
+      }))
     );
     setRandomDeck(shuffleArray(allCards).slice(0, 5));
     setRandomMode(true);
     setRandomFinished(false);
     setFlashIndex(0);
     setIsFlipped(false);
-    setRandomOrder(false);
   };
 
-  const leaveRandomMode = () => {
+  const selectQuestion = (sectionId, questionIndex) => {
+    setActiveSectionId(sectionId);
     setRandomMode(false);
     setRandomFinished(false);
-    setFlashIndex(0);
+    setFlashIndex(questionIndex);
     setIsFlipped(false);
   };
 
-  const cards = randomMode ? randomDeck : sectionCards;
+  const cards = randomMode ? randomDeck : activeSection.cards;
   const currentCard = cards[flashIndex];
-
-  const selectSection = id => {
-    setIsFlipped(false);
-    setActiveSectionId(id);
-    setFlashIndex(0);
-    setRandomOrder(false);
-    setRandomMode(false);
-    setRandomFinished(false);
-  };
 
   const move = delta => {
     setIsFlipped(false);
@@ -806,56 +797,118 @@ export default function App() {
       setFlashIndex(index => Math.max(0, Math.min(randomDeck.length - 1, index + delta)));
       return;
     }
-    setFlashIndex(index => (index + delta + cards.length) % cards.length);
+    setFlashIndex(index => Math.max(0, Math.min(activeSection.cards.length - 1, index + delta)));
   };
 
-  const shuffle = () => {
-    if (randomMode) {
-      startRandomSession();
-      return;
-    }
-    setIsFlipped(false);
-    setFlashIndex(0);
-    setRandomOrder(true);
-  };
+  const questionLabel = question => question
+    .replace(/\*\*/g, "")
+    .replace(/`/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
-  return <div className="app"><main className="content"><section className="flash-section">
-    <div className="section-navigation">
-      {sections.map(section => <button key={section.id} className={`section-button ${!randomMode && activeSectionId === section.id ? "active" : ""}`} onClick={() => selectSection(section.id)}>{section.name}</button>)}
-      <button className={`section-button ${randomMode ? "active" : ""}`} onClick={startRandomSession}>Случайные 5</button>
-    </div>
+  return <div className="app">
+    <main className="content">
+      <section className="flash-section">
+        <div className="study-layout" style={{ display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>
+          <aside className="navigator" style={{ flex: "0 0 250px", minWidth: 220, textAlign: "left" }}>
+            <h2 style={{ marginTop: 0 }}>Навигатор</h2>
+            <button className="section-button" onClick={startRandomSession} style={{ marginBottom: 16 }}>
+              Случайные 5
+            </button>
+            {sections.map(section => (
+              <details className="navigator-section" key={section.id} open={section.id === activeSectionId && !randomMode}
+                style={{ marginBottom: 12, textAlign: "left" }}>
+                <summary style={{ cursor: "pointer", fontWeight: 700, padding: "8px 4px" }}>
+                  {section.name} <span style={{ opacity: 0.65, fontWeight: 400 }}>({section.cards.length})</span>
+                </summary>
+                <div className="navigator-questions" style={{ display: "flex", flexDirection: "column", gap: 5, padding: "6px 0 6px 12px" }}>
+                  {section.cards.map((card, index) => {
+                    const selected = !randomMode && section.id === activeSectionId && index === flashIndex;
+                    return <button
+                      key={`${section.id}-${index}`}
+                      type="button"
+                      className={`navigator-question ${selected ? "active" : ""}`}
+                      onClick={() => selectQuestion(section.id, index)}
+                      aria-current={selected ? "page" : undefined}
+                      style={{
+                        textAlign: "left",
+                        whiteSpace: "normal",
+                        width: "100%",
+                        padding: "7px 9px",
+                        border: 0,
+                        borderRadius: 8,
+                        cursor: "pointer",
+                        background: selected ? "rgba(255,255,255,0.22)" : "transparent",
+                        color: "inherit",
+                        font: "inherit",
+                        lineHeight: 1.35
+                      }}
+                    >
+                      {index + 1}. {questionLabel(card.question)}
+                    </button>;
+                  })}
+                </div>
+              </details>
+            ))}
+          </aside>
 
-    {randomFinished ? <>
-      <div className="counter">Случайная подборка · 5 из 5</div>
-      <div className="flash-card">
-        <div className="flash-card-inner">
-          <div className="flash-card-front">
-            <span className="card-title">ГОТОВО</span>
-            <h1>Пять карточек пройдены.</h1>
-            <p className="click-text">На сегодня достаточно. Можно возвращаться к своим делам.</p>
+          <div className="flash-main" style={{ flex: "1 1 520px", minWidth: 0 }}>
+            {randomFinished ? <>
+              <div className="counter">Случайная подборка · 5 из 5</div>
+              <div className="flash-card">
+                <div className="flash-card-inner">
+                  <div className="flash-card-front">
+                    <span className="card-title">ГОТОВО</span>
+                    <h1>Пять карточек пройдены.</h1>
+                    <p className="click-text">На сегодня достаточно. Можно возвращаться к своим делам.</p>
+                  </div>
+                </div>
+              </div>
+              <div className="flash-controls">
+                <button onClick={startRandomSession}>Ещё 5 случайных</button>
+              </div>
+            </> : <>
+              <div className="counter">
+                {randomMode
+                  ? `Случайная подборка · ${currentCard?.category || ""} · Карточка ${flashIndex + 1} из 5`
+                  : `${activeSection.name} · Вопрос ${flashIndex + 1} из ${activeSection.cards.length}`}
+              </div>
+
+              {currentCard && <div
+                className={`flash-card ${isFlipped ? "flipped" : ""}`}
+                onClick={() => setIsFlipped(value => !value)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={event => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setIsFlipped(value => !value);
+                  }
+                }}
+              >
+                <div className="flash-card-inner">
+                  <div className="flash-card-front">
+                    <span className="card-title">ВОПРОС</span>
+                    <h1>{currentCard.question}</h1>
+                    <p className="click-text">Нажми на карточку, чтобы увидеть ответ</p>
+                  </div>
+                  <div className="flash-card-back">
+                    <span className="card-title">ОТВЕТ</span>
+                    <MarkdownAnswer source={currentCard.answer} />
+                  </div>
+                </div>
+              </div>}
+
+              <div className="flash-controls">
+                <button onClick={() => move(-1)} disabled={randomMode && flashIndex === 0}>← Назад</button>
+                <button onClick={() => move(1)}>
+                  {randomMode && flashIndex === 4 ? "Завершить →" : "Следующая →"}
+                </button>
+              </div>
+            </>}
           </div>
         </div>
-      </div>
-      <div className="flash-controls">
-        <button onClick={startRandomSession}>Ещё 5 случайных</button>
-        <button onClick={leaveRandomMode}>К категориям</button>
-      </div>
-    </> : <>
-      <div className="counter">
-        {randomMode
-          ? `Случайная подборка · ${currentCard?.category || ""} · Вопрос ${flashIndex + 1} из 5`
-          : `${activeSection.name} · Вопрос ${flashIndex + 1} из ${cards.length}`}
-      </div>
-
-      {currentCard && <div className={`flash-card ${isFlipped ? "flipped" : ""}`} onClick={() => setIsFlipped(value => !value)} role="button" tabIndex={0} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") setIsFlipped(value => !value); }}>
-        <div className="flash-card-inner"><div className="flash-card-front"><span className="card-title">ВОПРОС</span><h1>{currentCard.question}</h1><p className="click-text">Нажми на карточку, чтобы увидеть ответ</p></div>
-          <div className="flash-card-back"><span className="card-title">ОТВЕТ</span><MarkdownAnswer source={currentCard.answer} /></div></div></div>}
-
-      <div className="flash-controls">
-        <button onClick={() => move(-1)} disabled={randomMode && flashIndex === 0}>← Назад</button>
-        <button onClick={() => move(1)}>{randomMode && flashIndex === 4 ? "Завершить →" : "Следующая →"}</button>
-        <button onClick={shuffle}>{randomMode ? "Другие 5" : "Перемешать"}</button>
-      </div>
-    </>}
-  </section></main></div>;
+      </section>
+    </main>
+  </div>;
 }
