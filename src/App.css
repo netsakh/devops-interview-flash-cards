@@ -445,9 +445,7 @@ body {
   border-radius: 8px;
   background: #fff;
   color: #111;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
+  font: inherit;
   line-height: 1.35;
   text-align: left;
   white-space: normal;
