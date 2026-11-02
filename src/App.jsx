@@ -908,14 +908,16 @@ export default function App() {
   const activeSection = sections.find(section => section.id === activeSectionId) || sections[0];
 
   const startRandomSession = () => {
-    const allCards = sections.flatMap(section =>
-      section.cards.map((card, index) => ({
-        ...card,
-        category: section.name,
-        sourceSectionId: section.id,
-        sourceIndex: index
-      }))
-    );
+    const allCards = sections
+      .filter(section => section.id === "kubernetes" || section.id === "docker")
+      .flatMap(section =>
+        section.cards.map((card, index) => ({
+          ...card,
+          category: section.name,
+          sourceSectionId: section.id,
+          sourceIndex: index
+        }))
+      );
     setRandomDeck(shuffleArray(allCards).slice(0, 5));
     setRandomMode(true);
     setRandomFinished(false);
@@ -992,8 +994,8 @@ export default function App() {
                 <div className="flash-card-inner">
                   <div className="flash-card-front">
                     <span className="card-title">ГОТОВО</span>
-                    <h1>Пять карточек пройдены.</h1>
-                    <p className="click-text">На сегодня достаточно. Можно возвращаться к своим делам.</p>
+                    <h1>Ты ответил на все 5 карточек.</h1>
+                    <p className="click-text">Подборка завершена. Шестой карточки нет.</p>
                   </div>
                 </div>
               </div>
@@ -1035,7 +1037,7 @@ export default function App() {
               <div className="flash-controls">
                 <button onClick={() => move(-1)} disabled={randomMode && flashIndex === 0}>← Назад</button>
                 <button onClick={() => move(1)}>
-                  {randomMode && flashIndex === 4 ? "Завершить →" : "Следующая →"}
+                  {randomMode && flashIndex === randomDeck.length - 1 ? "Завершить →" : "Следующая →"}
                 </button>
               </div>
             </>}
